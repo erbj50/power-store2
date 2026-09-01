@@ -35,12 +35,11 @@ exports.handler = async (event, context) => {
     if (minPrice) filterArgs += `, minPrice: ${minPrice}`;
     if (maxPrice) filterArgs += `, maxPrice: ${maxPrice}`;
 
-    const query = `query { shopeeOfferV2(${filterArgs}) { nodes { imageUrl offerLink offerName price commissionRate sales } } }`;
+    // GraphQL corrigido com os nomes exatos aceitos pela API da Shopee
+    const query = `query { shopeeOfferV2(${filterArgs}) { nodes { imageUrl offerLink offerName priceMin priceMax commissionRate ratingStar } } }`;
 
-    // 1. Monta o payload exatamente como será enviado no body da requisição
     const payload = JSON.stringify({ query });
 
-    // 2. Calcula o hash usando o payload stringificado (AppId + Timestamp + Payload + AppSecret)
     const factor = appId + timestamp + payload + appSecret;
     const signature = crypto.createHash('sha256').update(factor).digest('hex');
 
