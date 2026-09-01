@@ -17,22 +17,18 @@ exports.handler = async (event, context) => {
 
     const params = event.queryStringParameters || {};
 
-    // Configurações de paginação (padrão: página 1, 30 itens por chamada)
     const page = parseInt(params.page) || 1;
     const limit = parseInt(params.limit) || 30;
     
-    // Filtros opcionais
     const categoryId = params.categoryId ? parseInt(params.categoryId) : null;
     const minCommission = params.minCommission ? parseFloat(params.minCommission) : null;
     const minPrice = params.minPrice ? parseFloat(params.minPrice) : null;
     const maxPrice = params.maxPrice ? parseFloat(params.maxPrice) : null;
     
-    // sortType 2 = Mais Vendidos (Volume de Vendas)
     const sortType = params.sortType ? parseInt(params.sortType) : 2; 
 
     const timestamp = Math.floor(Date.now() / 1000);
 
-    // Monta a query GraphQL dinamicamente
     let filterArgs = `page: ${page}, limit: ${limit}, sortType: ${sortType}`;
     if (categoryId) filterArgs += `, categoryId: ${categoryId}`;
     if (minCommission) filterArgs += `, minCommissionRate: ${minCommission}`;
@@ -41,8 +37,11 @@ exports.handler = async (event, context) => {
 
     const query = `query { shopeeOfferV2(${filterArgs}) { nodes { imageUrl offerLink offerName price commissionRate sales } } }`;
 
-    // Assinatura de autenticação exigida pela Shopee
-    const factor = appId + timestamp + query + appSecret;
+    // 1. Monta o payload exatamente como será enviado no body da requisição
+    const payload = JSON.stringify({ query });
+
+    // 2. Calcula o hash usando o payload stringificado (AppId + Timestamp + Payload + AppSecret)
+    const factor = appId + timestamp + payload + appSecret;
     const signature = crypto.createHash('sha256').update(factor).digest('hex');
 
     try {
@@ -52,7 +51,7 @@ exports.handler = async (event, context) => {
                 'Content-Type': 'application/json',
                 'Authorization': `SHA256 Credential=${appId}, Timestamp=${timestamp}, Signature=${signature}`
             },
-            body: JSON.stringify({ query })
+            body: payload
         });
 
         const data = await response.json();
