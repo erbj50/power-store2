@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Store - Ofertas Exclusivas Shopee</title>
+
+    <link rel="icon" href="./image/store.png" type="image/png">
+    
+    <!-- Meta tag de verificação do Pinterest -->
+    <meta name="p:domain_verify" content="c1d0e47ab117bb078759023fc550a60b"/>
+
+    <!-- Metadados Open Graph -->
+    <meta property="og:type" content="product" />
+    <meta property="og:title" content="Power Store - Ofertas Exclusivas" />
+    <meta property="og:description" content="Confira os melhores produtos e ofertas selecionadas na Power Store." />
+    <meta property="og:url" content="https://power-store.erbj.com.br/" />
+    <meta property="og:image" content="https://power-store.erbj.com.br/image/store.png" />
+    <meta property="og:site_name" content="Power Store" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #f8f9fa;
+            --header-bg: #1359ee48;
+            --card-bg: #10121a;
+            --card-border: #ff6b35;
+            --button-bg: #ff6b35;
+            --button-text: #ffffff;
+            --primary-color: #ff6b35;
+            --secondary-color: #ff3535;
+            --tertiary-color: #35a2ff;
+            --quaternary-color: #35ff6b;
+            --quinary-color: #ffd700;
+            --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --font-size-large: 2rem;
+            --font-size-medium: 1.2rem;
+            --font-size-small: 0.9rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.4;
+            background-image: url('./image/bg.gif');
+            background-size: 30%;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--header-bg);
+            min-height: 60px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 4px solid var(--primary-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .radio-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-player {
+            width: 45px;
+            height: 45px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(0, 0, 0, 0.4);
+            color: rgba(206, 232, 233, 0.9);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin: 2px;
+            border-radius: 8px;
+        }
+
+        .btn-player:hover {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border-color: #ffffff;
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+
+        .radio-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        audio { display: none; }
+
+        /* GRID E CARDS GRANDES */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .ads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            padding: 1.5rem 1rem;
+        }
+
+        .ad-container {
+            background-color: var(--card-bg);
+            border: 2px solid var(--primary-color);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            height: 580px; /* Mantém o tamanho grande imponente */
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .ad-container:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(255, 107, 53, 0.4);
+            border-color: var(--quinary-color);
+        }
+
+        /* CONTEINER DA IMAGEM INTEIRA */
+        .card-image-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(25, 30, 55, 0.8) 0%, rgba(5, 8, 15, 0.95) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding-bottom: 140px; /* Espaço para o glassmorphism flutuante */
+        }
+
+        .card-image-wrapper img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain; /* NUNCA corta cabeça, pé ou braço */
+            filter: drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.7));
+        }
+
+        /* PAINEL GLASSMORPHISM SOBREPOSTO */
+        .card-details-glass {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(180deg, rgba(8, 12, 24, 0.2) 0%, rgba(8, 12, 24, 0.85) 30%, rgba(4, 6, 14, 0.98) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .title-scroll-container {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .title-scroll-text {
+            display: inline-block;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 1.05rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .ad-container:hover .title-scroll-text {
+            animation: scrollTitle 8s linear infinite;
+        }
+
+        @keyframes scrollTitle {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+
+        .price-tag {
+            font-size: 1.4rem;
+            color: var(--quaternary-color);
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(53, 255, 107, 0.3);
+        }
+
+        /* CONTADORES (OCULTOS POR PADRÃO PARA USUÁRIOS) */
+        .weeks-clicks-container {
+            display: none !important; /* Oculto para o visitante final */
+            justify-content: space-between;
+            width: 100%;
+            gap: 4px;
+            margin-top: 4px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 4px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* VISÍVEL APENAS QUANDO O MODO ADMIN ESTIVER ATIVO */
+        body.admin-mode .weeks-clicks-container {
+            display: flex !important;
+        }
+
+        .day-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            padding: 2px 0;
+        }
+
+        .day-box.current-day {
+            background: var(--primary-color);
+        }
+
+        .day-box.current-day .day-label, 
+        .day-box.current-day .day-count {
+            color: #000000 !important;
+            font-weight: bold;
+        }
+
+        .day-label {
+            font-size: 0.7rem;
+            color: #aaaaaa;
+            text-transform: uppercase;
+        }
+
+        .day-count {
+            font-size: 1.1rem;
+            color: #ffffff;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        /* MICRO RODAPÉ DO CARD */
+        .card-micro-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            padding-top: 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .card-micro-footer span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* FOOTER PRINCIPAL E LOGO */
+        footer {
+            text-align: center;
+            padding: 2.5rem 1rem 1.5rem;
+            margin-top: 3rem;
+            border-top: 2px solid var(--secondary-color);
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer; /* Indica interação discreta */
+        }
+
+        .footer-logo {
+            max-width: 180px;
+            height: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .footer-logo img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 0px 10px rgba(255, 107, 53, 0.5));
+        }
+
+        footer p {
+            font-size: var(--font-size-small);
+            color: var(--quinary-color);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: var(--font-size-large);
+            color: var(--quinary-color);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 10px; }
+            .btn-player { width: 40px; height: 40px; font-size: 14px; }
+            .radio-label { font-size: 10px; }
+            .ads-grid { grid-template-columns: 1fr; }
+            .ad-container { height: 540px; }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="btn-group">
+            <div class="radio-control">
+                <button class="btn-player" data-radio="dance"><i class="fas fa-play"></i></button>
+                <span class="radio-label">Dance</span>
+                <audio id="dance" src="https://erbj.com.br/listen/power_dance/radio.mp3" preload="none"></audio>
+            </div>
+
+            <div class="radio-control">
+                <button class="btn-player" data-radio="pagode"><i class="fas fa-play"></i></button>
+                <span class="radio-label">Pagode</span>
+                <audio id="pagode" src="https://str1.castradios.com.br:10984/stream;" preload="none"></audio>
+            </div>
+
+            <div class="radio-control">
+                <button class="btn-player" data-radio="axe"><i class="fas fa-play"></i></button>
+                <span class="radio-label">Axé</span>
+                <audio id="axe" src="https://stream.zeno.fm/3qtbru47j3zvv/.stream;" preload="none"></audio>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <div class="radio-control">
+                <button class="btn-player" data-radio="mpb"><i class="fas fa-play"></i></button>
+                <span class="radio-label">MPB</span>
+                <audio id="mpb" src="https://s27.maxcast.com.br:8103/live?;" preload="none"></audio>
+            </div>
+
+            <div class="radio-control">
+                <button class="btn-player" data-radio="gospel"><i class="fas fa-play"></i></button>
+                <span class="radio-label">Gospel</span>
+                <audio id="gospel" src="https://stream3.svrdedicado.org/8070/stream;" preload="none"></audio>
+            </div>
+
+            <div class="radio-control">
+                <button class="btn-player" data-radio="sertanejo"><i class="fas fa-play"></i></button>
+                <span class="radio-label">Sertanejo</span>
+                <audio id="sertanejo" src="https://s42.maxcast.com.br:8180/live?id=640676173492/.stream;" preload="none"></audio>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="ads-grid" id="adsGrid">
+            <!-- Card Exemplo para Validação de Estrutura Visual -->
+            <div class="ad-container">
+                <div class="card-image-wrapper">
+                    <img src="./image/store.png" alt="Produto Power Store">
+                </div>
+                <div class="card-details-glass">
+                    <div class="title-scroll-container">
+                        <div class="title-scroll-text">Produto Exclusivo Power Store - Alta Qualidade e Oferta Especial</div>
+                    </div>
+                    <div class="price-tag">R$ 99,90</div>
+                    
+                    <!-- Contadores de cliques (Visíveis só no Modo Admin) -->
+                    <div class="weeks-clicks-container">
+                        <div class="day-box"><span class="day-label">Dom</span><span class="day-count">12</span></div>
+                        <div class="day-box"><span class="day-label">Seg</span><span class="day-count">45</span></div>
+                        <div class="day-box current-day"><span class="day-label">Ter</span><span class="day-count">89</span></div>
+                        <div class="day-box"><span class="day-label">Qua</span><span class="day-count">23</span></div>
+                        <div class="day-box"><span class="day-label">Qui</span><span class="day-count">56</span></div>
+                        <div class="day-box"><span class="day-label">Sex</span><span class="day-count">78</span></div>
+                        <div class="day-box"><span class="day-label">Sáb</span><span class="day-count">34</span></div>
+                    </div>
+
+                    <div class="card-micro-footer">
+                        <span><i class="fas fa-bolt"></i> Power Store</span>
+                        <span>ID: #001</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RODAPÉ COM LOGO E GATILHO OCULTO -->
+    <footer id="adminToggleFooter">
+        <div class="footer-logo">
+            <img src="./image/store1.png" alt="Power Store">
+        </div>
+        <p>© 2026 Power Store. Todos os direitos reservados erbj.</p>
+    </footer>
+
+    <script>
+        // CONTROLE DO PLAYER DE ÁUDIO
+        const buttons = document.querySelectorAll('.btn-player');
+        const audios = document.querySelectorAll('audio');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const radioId = button.getAttribute('data-radio');
+                const currentAudio = document.getElementById(radioId);
+                const icon = button.querySelector('i');
+
+                if (!currentAudio.paused) {
+                    currentAudio.pause();
+                    icon.className = 'fas fa-play';
+                } else {
+                    audios.forEach(audio => audio.pause());
+                    buttons.forEach(btn => btn.querySelector('i').className = 'fas fa-play');
+
+                    currentAudio.play().catch(error => console.log("Erro de reprodução:", error));
+                    icon.className = 'fas fa-pause';
+                }
+            });
+        });
+
+        // LÓGICA DE GERENCIAMENTO DO MODO ADMIN (TOGGLE 5 SEGUNDOS)
+        const footerTrigger = document.getElementById('adminToggleFooter');
+        let pressTimer = null;
+
+        // Recupera o estado salvo previamente no navegador
+        if (localStorage.getItem('power_store_admin_active') === 'true') {
+            document.body.classList.add('admin-mode');
+        }
+
+        function startPress() {
+            pressTimer = setTimeout(() => {
+                const isAdmin = document.body.classList.toggle('admin-mode');
+                localStorage.setItem('power_store_admin_active', isAdmin ? 'true' : 'false');
+                
+                if (isAdmin) {
+                    alert('⚡ Modo Administrador ATIVADO: Estatísticas de cliques visíveis.');
+                } else {
+                    alert('👁️ Modo Visitante ATIVADO: Visualização limpa do cliente final.');
+                }
+            }, 5000); // 5000ms = 5 segundos
+        }
+
+        function cancelPress() {
+            clearTimeout(pressTimer);
+        }
+
+        // Eventos para Mobile (Toque) e Computador (Clique)
+        footerTrigger.addEventListener('touchstart', startPress);
+        footerTrigger.addEventListener('touchend', cancelPress);
+        footerTrigger.addEventListener('mousedown', startPress);
+        footerTrigger.addEventListener('mouseup', cancelPress);
+        footerTrigger.addEventListener('mouseleave', cancelPress);
+    </script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBVHhRAdxIW2p0vWZuWsILrXzsIuLJmd08",
+        authDomain: "pwn-afiliados-urls.firebaseapp.com",
+        projectId: "pwn-afiliados-urls",
+        storageBucket: "pwn-afiliados-urls.firebasestorage.app",
+        messagingSenderId: "228959052596",
+        appId: "1:228959052596:web:36ea4e83a9ca6ece293b61"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // ==========================================
+    // GERENCIADOR INDEXEDDB (CACHE LOCAL ULTRA RÁPIDO)
+    // ==========================================
+    const DB_NAME = "PowerStoreCache";
+    const STORE_NAME = "shopee_api_products";
+
+    function openIndexedDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onupgradeneeded = (e) => {
+                const idb = e.target.result;
+                if (!idb.objectStoreNames.contains(STORE_NAME)) {
+                    idb.createObjectStore(STORE_NAME, { keyPath: "id" });
+                }
+            };
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async function saveApiAdsToIndexedDB(products) {
+        try {
+            const idb = await openIndexedDB();
+            const tx = idb.transaction(STORE_NAME, "readwrite");
+            const store = tx.objectStore(STORE_NAME);
+            store.clear(); // Limpa cache antigo antes de gravar o novo lote de 24h
+            products.forEach(p => store.put(p));
+        } catch (e) {
+            console.warn("Erro ao salvar no IndexedDB:", e);
+        }
+    }
+
+    async function getApiAdsFromIndexedDB() {
+        try {
+            const idb = await openIndexedDB();
+            return new Promise((resolve) => {
+                const tx = idb.transaction(STORE_NAME, "readonly");
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => resolve([]);
+            });
+        } catch (e) {
+            return [];
+        }
+    }
+
+    // Atualiza metadados no <head> dinamicamente
+    function updateMetaTags(prod) {
+        if (!prod) return;
+        document.title = `${prod.title} - Power Store`;
+
+        const setOgTag = (property, value) => {
+            const el = document.querySelector(`meta[property="${property}"]`);
+            if (el) el.setAttribute('content', value);
+        };
+
+        setOgTag('og:title', prod.title);
+        setOgTag('og:description', prod.description || prod.title);
+        setOgTag('og:image', prod.image || 'https://power-store.erbj.com.br/image/store.png');
+        setOgTag('og:url', `https://power-store.erbj.com.br/?id=${prod.id}`);
+    }
+
+    // Busca ofertas automáticas da API da Shopee via Netlify Function
+    async function fetchShopeeApiAds(startIdOffset = 150, page = 1, limit = 30) {
+        try {
+            const response = await fetch(`/api/shopee?page=${page}&limit=${limit}`);
+            const resData = await response.json();
+            const nodes = resData?.data?.shopeeOfferV2?.nodes || [];
+            
+            // Mapeia atribuindo numeração contínua (151, 152, 153...)
+            const mappedProducts = nodes.map((node, index) => ({
+                id: startIdOffset + index + 1,
+                title: node.offerName || 'Oferta Shopee',
+                price: node.price || '', 
+                image: node.imageUrl,
+                link: node.offerLink,
+                description: 'Oferta recomendada oficial da Shopee',
+                isApiProduct: true
+            }));
+
+            // Salva no IndexedDB em segundo plano
+            if (mappedProducts.length > 0) {
+                saveApiAdsToIndexedDB(mappedProducts);
+            }
+
+            return mappedProducts;
+        } catch (err) {
+            console.warn("Falha ao carregar ofertas em tempo real da API Shopee:", err);
+            return [];
+        }
+    }
+
+    // ==========================================
+    // CARREGAMENTO E MISTURA (FIREBASE + INDEXEDDB + API)
+    // ==========================================
+    const adsRef = ref(db, 'shopee_ads');
+    
+    // Trava de cache ajustada para 24 horas (em milissegundos)
+    const CACHE_DURATION = 24 * 60 * 60 * 1000; 
+
+    onValue(adsRef, async (snapshot) => {
+        const data = snapshot.val();
+        let firebaseAds = [];
+
+        if (data) {
+            firebaseAds = Object.keys(data).map(key => {
+                return { id: key, ...data[key] };
+            }).filter(ad => ad && ad.link && ad.title);
+        }
+
+        // Garante que a contagem para a API comece a partir de 150
+        let highestId = 150;
+        firebaseAds.forEach(ad => {
+            const numId = parseInt(ad.id);
+            if (!isNaN(numId) && numId > highestId) {
+                highestId = numId;
+            }
+        });
+
+        // 1. Renderização IMEDIATA via Cache do IndexedDB
+        const cachedApiAds = await getApiAdsFromIndexedDB();
+        let currentAds = [...firebaseAds, ...cachedApiAds];
+        
+        if (currentAds.length > 0) {
+            processAndRenderAds(currentAds);
+        }
+
+        // 2. Trava de 24 horas para consultar a API da Shopee novamente
+        const lastFetch = localStorage.getItem('shopee_last_fetch');
+        const now = Date.now();
+
+        if (!lastFetch || (now - parseInt(lastFetch)) > CACHE_DURATION || cachedApiAds.length === 0) {
+            // Busca o 1º lote de 30 itens na API em segundo plano
+            fetchShopeeApiAds(highestId, 1, 30).then((freshApiAds) => {
+                if (freshApiAds.length > 0) {
+                    localStorage.setItem('shopee_last_fetch', Date.now().toString());
+                    let updatedList = [...firebaseAds, ...freshApiAds];
+                    processAndRenderAds(updatedList);
+                }
+            });
+        }
+    });
+
+    function processAndRenderAds(liveShopeeAds) {
+        if (!liveShopeeAds || liveShopeeAds.length === 0) {
+            document.getElementById('adsGrid').innerHTML = '<div class="loading">📭 Nenhuma oferta encontrada.</div>';
+            return;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetId = urlParams.get('id');
+
+        if (targetId) {
+            const index = liveShopeeAds.findIndex(ad => String(ad.id) === String(targetId));
+            if (index !== -1) {
+                const targetAd = liveShopeeAds.splice(index, 1)[0];
+                liveShopeeAds.unshift(targetAd);
+                updateMetaTags(targetAd);
+            }
+        }
+
+        renderShopeeAds(liveShopeeAds);
+    }
+
+    // Registro de cliques no Realtime DB (Somente para IDs státicos/Firebase)
+    window.registerClick = function(id) {
+        const numId = parseInt(id);
+        if (!isNaN(numId) && numId > 150) return; // Produtos da API não contam no Firebase do Admin
+
+        const hoje = new Date();
+        let diaSemana = hoje.getDay(); 
+        let indexDia = diaSemana === 0 ? 6 : diaSemana - 1;
+
+        const clickRef = ref(db, `shopee_ads/${id}/clicks/${indexDia}`);
+        
+        runTransaction(clickRef, (currentValue) => {
+            return (currentValue || 0) + 1;
+        });
+    };
+
+    // Renderizador com Layout Glassmorphism e Imagem Inteira
+    function renderShopeeAds(ads) {
+        const adsGrid = document.getElementById('adsGrid');
+        if (!ads || ads.length === 0) {
+            adsGrid.innerHTML = '<div class="loading">📭 Nenhuma oferta disponível.</div>';
+            return;
+        }
+
+        const hoje = new Date();
+        const diaSemanaAtual = hoje.getDay() === 0 ? 6 : hoje.getDay() - 1;
+        const labelsDias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+
+        let htmlContent = '';
+        ads.forEach((prod) => {
+            const bannerImg = prod.image || './image/store.png';
+            const priceHTML = prod.price ? `<div class="price-tag">R$ ${prod.price}</div>` : '';
+            const tituloTratado = prod.title ? prod.title.toUpperCase() : 'OFERTA IMPERDÍVEL';
+            const clicksDoProduto = prod.clicks || [0, 0, 0, 0, 0, 0, 0];
+
+            let boxesHTML = '<div class="weeks-clicks-container">';
+            labelsDias.forEach((dia, i) => {
+                const classeAtual = (i === diaSemanaAtual) ? 'day-box current-day' : 'day-box';
+                boxesHTML += `
+                    <div class="${classeAtual}">
+                        <span class="day-label">${dia}</span>
+                        <span class="day-count">${clicksDoProduto[i] || 0}</span>
+                    </div>
+                `;
+            });
+            boxesHTML += '</div>';
+
+            htmlContent += `
+            <div class="ad-container" id="prod-${prod.id}">
+                <a href="${prod.link}" target="_blank" onclick="registerClick('${prod.id}')" style="text-decoration:none; color:inherit; width:100%; height:100%; display:block;">
+                    
+                    <div class="card-image-wrapper">
+                        <img src="${bannerImg}" alt="${prod.title}" loading="lazy">
+                    </div>
+                    
+                    <div class="card-details-glass">
+                        <div class="title-scroll-container">
+                            <div class="title-scroll-text">
+                                🛍️ ${tituloTratado} &nbsp;&nbsp;&nbsp;&nbsp; 🛍️ ${tituloTratado}
+                            </div>
+                        </div>
+                        
+                        ${priceHTML}
+                        
+                        ${boxesHTML}
+                        
+                        <div class="card-micro-footer">
+                            <span><i class="fas fa-bolt" style="color:var(--primary-color);"></i> Power Store</span>
+                            <span>ID: #${prod.id}</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            `;
+        });
+
+        adsGrid.innerHTML = htmlContent;
+    }
+</script>
+
+
+</body>
+</html>
