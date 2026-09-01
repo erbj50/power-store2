@@ -631,21 +631,32 @@
             processAndRenderAds(currentAds);
         }
 
-        // 2. Trava de 24 horas para consultar a API da Shopee novamente
-        const lastFetch = localStorage.getItem('shopee_last_fetch');
-        const now = Date.now();
 
-        if (!lastFetch || (now - parseInt(lastFetch)) > CACHE_DURATION || cachedApiAds.length === 0) {
-            // Busca o 1º lote de 30 itens na API em segundo plano
-            fetchShopeeApiAds(highestId, 1, 30).then((freshApiAds) => {
-                if (freshApiAds.length > 0) {
-                    localStorage.setItem('shopee_last_fetch', Date.now().toString());
-                    let updatedList = [...firebaseAds, ...freshApiAds];
-                    processAndRenderAds(updatedList);
-                }
-            });
-        }
-    });
+
+
+
+async function fetchShopeeApiAds(highestId = 0) {
+    try {
+        const response = await fetch('/api/shopee');
+        const result = await response.json();
+        
+        const products = result?.data?.shopeeOfferV2?.nodes || [];
+        
+        // Garante a atribuicao de IDs sequenciais para os cards no frontend
+        return products.map((item, index) => ({
+            ...item,
+            id: highestId + index + 1
+        }));
+    } catch (error) {
+        console.error("Erro ao buscar produtos da Shopee:", error);
+        return [];
+    }
+}
+
+
+
+
+
 
     function processAndRenderAds(liveShopeeAds) {
         if (!liveShopeeAds || liveShopeeAds.length === 0) {
