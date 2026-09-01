@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-// Lista negra de palavras-chave para filtrar ofertas indesejadas
+// Lista negra de palavras-chave para filtrar itens indesejados
 const BLACKLIST_KEYWORDS = [
     'curso', 'e-book', 'ebook', 'rifa', 'apostas', 'cassino', 
     'adulto', 'sex', 'vibrador', '18+', 'grupo vip', 'sinais'
@@ -26,15 +26,29 @@ exports.handler = async (event, context) => {
     const page = parseInt(params.page) || 1;
     const limit = parseInt(params.limit) || 30;
     const categoryId = params.categoryId ? parseInt(params.categoryId) : null;
-    const sortType = params.sortType ? parseInt(params.sortType) : 2; // 2 = Mais Vendidos
+    const keyword = params.keyword ? params.keyword : "";
 
     const timestamp = Math.floor(Date.now() / 1000);
 
-    let filterArgs = `page: ${page}, limit: ${limit}, sortType: ${sortType}`;
+    // Filtros para listagem de PRODUTOS REAIS (productOfferV2)
+    let filterArgs = `page: ${page}, limit: ${limit}`;
     if (categoryId) filterArgs += `, categoryId: ${categoryId}`;
+    if (keyword) filterArgs += `, keyword: "${keyword}"`;
 
-    // Query GraphQL com os campos validos
-    const query = `query { shopeeOfferV2(${filterArgs}) { nodes { offerName imageUrl offerLink commissionRate } } }`;
+    // Query GraphQL buscando os dados exatos do produto
+    const query = `query {
+        productOfferV2(${filterArgs}) {
+            nodes {
+                itemId
+                productName
+                price
+                imageUrl
+                offerLink
+                commissionRate
+                sales
+            }
+        }
+    }`;
 
     const payload = JSON.stringify({ query });
 
@@ -53,12 +67,40 @@ exports.handler = async (event, context) => {
 
         const data = await response.json();
 
-        // Filtro da Lista Negra
-        if (data && data.data && data.data.shopeeOfferV2 && data.data.shopeeOfferV2.nodes) {
-            data.data.shopeeOfferV2.nodes = data.data.shopeeOfferV2.nodes.filter(item => {
-                const nameLower = (item.offerName || '').toLowerCase();
-                return !BLACKLIST_KEYWORDS.some(keyword => nameLower.includes(keyword));
+        // Processa os dados retornados do productOfferV2
+        if (data && data.data && data.data.productOfferV2 && data.data.productOfferV2.nodes) {
+            
+            // Filtra palavras da lista negra
+            const filteredNodes = data.data.productOfferV2.nodes.filter(item => {
+                const nameLower = (item.productName || '').toLowerCase();
+                return !BLACKLIST_KEYWORDS.some(word => nameLower.includes(word));
             });
+
+            // Mapeia para padronizar as propriedades para o seu front-end
+            const formattedNodes = filteredNodes.map(item => ({
+                itemId: item.itemId,
+                offerName: item.productName,
+                price: item.price,
+                imageUrl: item.imageUrl,
+                offerLink: item.offerLink,
+                commissionRate: item.commissionRate
+            }));
+
+            // Retorna no formato esperado pelo seu front
+            return {
+                statusCode: 200,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    data: {
+                        shopeeOfferV2: {
+                            nodes: formattedNodes
+                        }
+                    }
+                })
+            };
         }
 
         return {
@@ -69,6 +111,7 @@ exports.handler = async (event, context) => {
             },
             body: JSON.stringify(data)
         };
+
     } catch (error) {
         return {
             statusCode: 500,
