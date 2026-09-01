@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-// Lista negra de palavras-chave para filtrar itens indesejados
+// Lista negra de palavras-chave
 const BLACKLIST_KEYWORDS = [
     'curso', 'e-book', 'ebook', 'rifa', 'apostas', 'cassino', 
     'adulto', 'sex', 'vibrador', '18+', 'grupo vip', 'sinais'
@@ -25,19 +25,12 @@ exports.handler = async (event, context) => {
 
     const page = parseInt(params.page) || 1;
     const limit = parseInt(params.limit) || 30;
-    const categoryId = params.categoryId ? parseInt(params.categoryId) : null;
-    const keyword = params.keyword ? params.keyword : "";
 
     const timestamp = Math.floor(Date.now() / 1000);
 
-    // Filtros para listagem de PRODUTOS REAIS (productOfferV2)
-    let filterArgs = `page: ${page}, limit: ${limit}`;
-    if (categoryId) filterArgs += `, categoryId: ${categoryId}`;
-    if (keyword) filterArgs += `, keyword: "${keyword}"`;
-
-    // Query GraphQL buscando os dados exatos do produto
+    // Query da aba "Oferta de Produto" (productOfferV2)
     const query = `query {
-        productOfferV2(${filterArgs}) {
+        productOfferV2(page: ${page}, limit: ${limit}) {
             nodes {
                 itemId
                 productName
@@ -45,7 +38,6 @@ exports.handler = async (event, context) => {
                 imageUrl
                 offerLink
                 commissionRate
-                sales
             }
         }
     }`;
@@ -65,43 +57,26 @@ exports.handler = async (event, context) => {
             body: payload
         });
 
-        const data = await response.json();
+        const result = await response.json();
 
-        // Processa os dados retornados do productOfferV2
-        if (data && data.data && data.data.productOfferV2 && data.data.productOfferV2.nodes) {
-            
-            // Filtra palavras da lista negra
-            const filteredNodes = data.data.productOfferV2.nodes.filter(item => {
-                const nameLower = (item.productName || '').toLowerCase();
-                return !BLACKLIST_KEYWORDS.some(word => nameLower.includes(word));
-            });
+        // Extrai os produtos retornados do productOfferV2
+        let items = result?.data?.productOfferV2?.nodes || [];
 
-            // Mapeia para padronizar as propriedades para o seu front-end
-            const formattedNodes = filteredNodes.map(item => ({
-                itemId: item.itemId,
-                offerName: item.productName,
-                price: item.price,
-                imageUrl: item.imageUrl,
-                offerLink: item.offerLink,
-                commissionRate: item.commissionRate
-            }));
+        // Aplica o filtro da lista negra pelo nome do produto
+        items = items.filter(item => {
+            const nameLower = (item.productName || '').toLowerCase();
+            return !BLACKLIST_KEYWORDS.some(word => nameLower.includes(word));
+        });
 
-            // Retorna no formato esperado pelo seu front
-            return {
-                statusCode: 200,
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    data: {
-                        shopeeOfferV2: {
-                            nodes: formattedNodes
-                        }
-                    }
-                })
-            };
-        }
+        // Formata o JSON de saída mapeado para o que o seu frontend espera
+        const formattedNodes = items.map(item => ({
+            itemId: item.itemId,
+            offerName: item.productName,
+            price: item.price ? `R$ ${parseFloat(item.price).toFixed(2).replace('.', ',')}` : "R$ --",
+            imageUrl: item.imageUrl,
+            offerLink: item.offerLink,
+            commissionRate: item.commissionRate
+        }));
 
         return {
             statusCode: 200,
@@ -109,7 +84,13 @@ exports.handler = async (event, context) => {
                 "Access-Control-Allow-Origin": "*",
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify({
+                data: {
+                    shopeeOfferV2: {
+                        nodes: formattedNodes
+                    }
+                }
+            })
         };
 
     } catch (error) {
