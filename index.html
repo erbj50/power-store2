@@ -528,7 +528,7 @@
             const idb = await openIndexedDB();
             const tx = idb.transaction(STORE_NAME, "readwrite");
             const store = tx.objectStore(STORE_NAME);
-            store.clear(); // Limpa cache antigo antes de gravar o novo lote de 24h
+            store.clear(); // Limpa cache antigo antes de gravar o novo lote
             products.forEach(p => store.put(p));
         } catch (e) {
             console.warn("Erro ao salvar no IndexedDB:", e);
@@ -567,15 +567,15 @@
     }
 
     // Busca ofertas automáticas da API da Shopee via Netlify Function
-    async function fetchShopeeApiAds(startIdOffset = 150, page = 1, limit = 30) {
+    async function fetchShopeeApiAds(highestId = 150) {
         try {
-            const response = await fetch(`/api/shopee?page=${page}&limit=${limit}`);
-            const resData = await response.json();
-            const nodes = resData?.data?.shopeeOfferV2?.nodes || [];
+            const response = await fetch('/api/shopee');
+            const result = await response.json();
             
-            // Mapeia atribuindo numeração contínua (151, 152, 153...)
+            const nodes = result?.data?.shopeeOfferV2?.nodes || [];
+            
             const mappedProducts = nodes.map((node, index) => ({
-                id: startIdOffset + index + 1,
+                id: highestId + index + 1,
                 title: node.offerName || 'Oferta Shopee',
                 price: node.price || '', 
                 image: node.imageUrl,
@@ -584,14 +584,13 @@
                 isApiProduct: true
             }));
 
-            // Salva no IndexedDB em segundo plano
             if (mappedProducts.length > 0) {
-                saveApiAdsToIndexedDB(mappedProducts);
+                await saveApiAdsToIndexedDB(mappedProducts);
             }
 
             return mappedProducts;
-        } catch (err) {
-            console.warn("Falha ao carregar ofertas em tempo real da API Shopee:", err);
+        } catch (error) {
+            console.error("Erro ao buscar produtos da Shopee:", error);
             return [];
         }
     }
@@ -600,9 +599,7 @@
     // CARREGAMENTO E MISTURA (FIREBASE + INDEXEDDB + API)
     // ==========================================
     const adsRef = ref(db, 'shopee_ads');
-    
-    // Trava de cache ajustada para 24 horas (em milissegundos)
-    const CACHE_DURATION = 24 * 60 * 60 * 1000; 
+    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 horas em ms
 
     onValue(adsRef, async (snapshot) => {
         const data = snapshot.val();
@@ -614,7 +611,6 @@
             }).filter(ad => ad && ad.link && ad.title);
         }
 
-        // Garante que a contagem para a API comece a partir de 150
         let highestId = 150;
         firebaseAds.forEach(ad => {
             const numId = parseInt(ad.id);
@@ -623,7 +619,7 @@
             }
         });
 
-        // 1. Renderização IMEDIATA via Cache do IndexedDB
+        // 1. Renderização imediata via Cache do IndexedDB
         const cachedApiAds = await getApiAdsFromIndexedDB();
         let currentAds = [...firebaseAds, ...cachedApiAds];
         
@@ -631,32 +627,20 @@
             processAndRenderAds(currentAds);
         }
 
+        // 2. Trava de 24 horas para consultar a API e atualizar o cache em segundo plano
+        const lastFetch = localStorage.getItem('shopee_last_fetch');
+        const now = Date.now();
 
-
-
-
-async function fetchShopeeApiAds(highestId = 0) {
-    try {
-        const response = await fetch('/api/shopee');
-        const result = await response.json();
-        
-        const products = result?.data?.shopeeOfferV2?.nodes || [];
-        
-        // Garante a atribuicao de IDs sequenciais para os cards no frontend
-        return products.map((item, index) => ({
-            ...item,
-            id: highestId + index + 1
-        }));
-    } catch (error) {
-        console.error("Erro ao buscar produtos da Shopee:", error);
-        return [];
-    }
-}
-
-
-
-
-
+        if (!lastFetch || (now - parseInt(lastFetch)) > CACHE_DURATION || cachedApiAds.length === 0) {
+            fetchShopeeApiAds(highestId).then((freshApiAds) => {
+                if (freshApiAds.length > 0) {
+                    localStorage.setItem('shopee_last_fetch', Date.now().toString());
+                    let updatedList = [...firebaseAds, ...freshApiAds];
+                    processAndRenderAds(updatedList);
+                }
+            });
+        }
+    });
 
     function processAndRenderAds(liveShopeeAds) {
         if (!liveShopeeAds || liveShopeeAds.length === 0) {
@@ -679,10 +663,10 @@ async function fetchShopeeApiAds(highestId = 0) {
         renderShopeeAds(liveShopeeAds);
     }
 
-    // Registro de cliques no Realtime DB (Somente para IDs státicos/Firebase)
+    // Registro de cliques no Realtime DB (Apenas IDs estáticos/Firebase)
     window.registerClick = function(id) {
         const numId = parseInt(id);
-        if (!isNaN(numId) && numId > 150) return; // Produtos da API não contam no Firebase do Admin
+        if (!isNaN(numId) && numId > 150) return;
 
         const hoje = new Date();
         let diaSemana = hoje.getDay(); 
@@ -695,7 +679,7 @@ async function fetchShopeeApiAds(highestId = 0) {
         });
     };
 
-    // Renderizador com Layout Glassmorphism e Imagem Inteira
+    // Renderizador com Layout Glassmorphism
     function renderShopeeAds(ads) {
         const adsGrid = document.getElementById('adsGrid');
         if (!ads || ads.length === 0) {
@@ -757,28 +741,6 @@ async function fetchShopeeApiAds(highestId = 0) {
 
         adsGrid.innerHTML = htmlContent;
     }
-</script>
-
-
-
-<script>
-// Bloqueia o menu de contexto (botão direito)
-document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-});
-
-// Bloqueia teclas de atalho do DevTools e visualização de código-fonte
-document.addEventListener('keydown', function(e) {
-    if (
-        e.key === 'F12' || 
-        e.keyCode === 123 ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
-        (e.ctrlKey && (e.key === 'U' || e.key === 'u'))
-    ) {
-        e.preventDefault();
-        return false;
-    }
-});
 </script>
 
 
