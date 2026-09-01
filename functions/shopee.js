@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-// Lista negra de palavras-chave
+// Lista negra de palavras-chave para filtrar ofertas indesejadas
 const BLACKLIST_KEYWORDS = [
     'curso', 'e-book', 'ebook', 'rifa', 'apostas', 'cassino', 
     'adulto', 'sex', 'vibrador', '18+', 'grupo vip', 'sinais'
@@ -33,7 +33,7 @@ exports.handler = async (event, context) => {
     let filterArgs = `page: ${page}, limit: ${limit}, sortType: ${sortType}`;
     if (categoryId) filterArgs += `, categoryId: ${categoryId}`;
 
-    // Query estritamente compativel com o tipo ShopeeOfferV2
+    // Query GraphQL com os campos validos
     const query = `query { shopeeOfferV2(${filterArgs}) { nodes { offerName imageUrl offerLink commissionRate } } }`;
 
     const payload = JSON.stringify({ query });
@@ -53,21 +53,11 @@ exports.handler = async (event, context) => {
 
         const data = await response.json();
 
-        // Filtragem de palavras indesejadas e comissao >= 11%
+        // Filtro da Lista Negra
         if (data && data.data && data.data.shopeeOfferV2 && data.data.shopeeOfferV2.nodes) {
             data.data.shopeeOfferV2.nodes = data.data.shopeeOfferV2.nodes.filter(item => {
                 const nameLower = (item.offerName || '').toLowerCase();
-                
-                // 1. Filtro da Lista Negra
-                const isBlacklisted = BLACKLIST_KEYWORDS.some(keyword => nameLower.includes(keyword));
-                
-                // 2. Normalização e checagem de comissão >= 11%
-                let rate = parseFloat(item.commissionRate) || 0;
-                if (rate < 1) rate = rate * 100;
-
-                const hasMinCommission = rate >= 11;
-
-                return !isBlacklisted && hasMinCommission;
+                return !BLACKLIST_KEYWORDS.some(keyword => nameLower.includes(keyword));
             });
         }
 
