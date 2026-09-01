@@ -2,9 +2,7 @@ const crypto = require('crypto');
 
 // Lista negra de palavras-chave
 const BLACKLIST_KEYWORDS = [
-    'curso', 'e-book', 'ebook', 'rifa', 'apostas', 'cassino',
-    'cama mesa banho', 'toalha mesa', 'toalha de banheiro', 'roupas',
-    'fastfood', 'e-book', 'ebook', 'rifa', 'apostas', 'cassino',
+    'curso', 'e-book', 'ebook', 'rifa', 'apostas', 'cassino', 
     'adulto', 'sex', 'vibrador', '18+', 'grupo vip', 'sinais'
 ];
 
@@ -36,12 +34,12 @@ exports.handler = async (event, context) => {
 
     const timestamp = Math.floor(Date.now() / 1000);
 
-    // Filtros válidos suportados pelo shopeeOfferV2
+    // Filtros aceitos diretamente pela query do GraphQL
     let filterArgs = `page: ${page}, limit: ${limit}, sortType: ${sortType}`;
     if (categoryId) filterArgs += `, categoryId: ${categoryId}`;
 
-    // Query com campos do esquema V2 da Shopee Affiliate
-    const query = `query { shopeeOfferV2(${filterArgs}) { nodes { offerName imageUrl offerLink commissionRate commission priceDiscountRate } } }`;
+    // Query GraphQL apenas com os campos estritamente válidos de ShopeeOfferV2
+    const query = `query { shopeeOfferV2(${filterArgs}) { nodes { offerName imageUrl offerLink commissionRate } } }`;
 
     const payload = JSON.stringify({ query });
 
@@ -60,7 +58,7 @@ exports.handler = async (event, context) => {
 
         const data = await response.json();
 
-        // Processamento de filtros no Backend (Comissão >= 11% e Lista Negra)
+        // Processamento de filtros via JavaScript (Comissão >= 11% e Lista Negra)
         if (data && data.data && data.data.shopeeOfferV2 && data.data.shopeeOfferV2.nodes) {
             data.data.shopeeOfferV2.nodes = data.data.shopeeOfferV2.nodes.filter(item => {
                 const nameLower = (item.offerName || '').toLowerCase();
