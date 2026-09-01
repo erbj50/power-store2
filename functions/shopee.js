@@ -33,7 +33,8 @@ exports.handler = async (event, context) => {
     let filterArgs = `page: ${page}, limit: ${limit}, sortType: ${sortType}`;
     if (categoryId) filterArgs += `, categoryId: ${categoryId}`;
 
-    const query = `query { shopeeOfferV2(${filterArgs}) { nodes { offerName imageUrl offerLink commissionRate price } } }`;
+    // Query estritamente compativel com o tipo ShopeeOfferV2
+    const query = `query { shopeeOfferV2(${filterArgs}) { nodes { offerName imageUrl offerLink commissionRate } } }`;
 
     const payload = JSON.stringify({ query });
 
@@ -52,17 +53,17 @@ exports.handler = async (event, context) => {
 
         const data = await response.json();
 
-        // Filtragem segura de lista negra e validação de comissão
+        // Filtragem de palavras indesejadas e comissao >= 11%
         if (data && data.data && data.data.shopeeOfferV2 && data.data.shopeeOfferV2.nodes) {
             data.data.shopeeOfferV2.nodes = data.data.shopeeOfferV2.nodes.filter(item => {
                 const nameLower = (item.offerName || '').toLowerCase();
                 
-                // 1. Filtro de palavras da Lista Negra
+                // 1. Filtro da Lista Negra
                 const isBlacklisted = BLACKLIST_KEYWORDS.some(keyword => nameLower.includes(keyword));
                 
-                // 2. Normaliza e verifica se a comissao e >= 11%
+                // 2. Normalização e checagem de comissão >= 11%
                 let rate = parseFloat(item.commissionRate) || 0;
-                if (rate < 1) rate = rate * 100; // Converte 0.11 para 11 caso venha em decimal
+                if (rate < 1) rate = rate * 100;
 
                 const hasMinCommission = rate >= 11;
 
